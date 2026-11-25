@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSINT Phone Number Lookup Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .search-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        #phoneInput {
+            flex: 1;
+            padding: 15px;
+            font-size: 1.1em;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+        }
+
+        #phoneInput:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .search-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .info-text {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+
+        .sources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .source-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .source-card:hover {
+            border-color: #667eea;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .source-card h3 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .source-card p {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .source-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .disclaimer {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .disclaimer h3 {
+            color: #d32f2f;
+            margin-bottom: 10px;
+        }
+
+        .disclaimer p {
+            color: #555;
+            line-height: 1.6;
+            font-size: 0.9em;
+        }
+
+        .features {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .features h2 {
+            margin-bottom: 15px;
+        }
+
+        .features ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .features li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .features li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .sources-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 OSINT Phone Number Lookup</h1>
+            <p>Comprehensive phone number intelligence gathering tool</p>
+        </div>
+
+        <div class="features">
+            <h2>Features</h2>
+            <ul>
+                <li>Search across 15+ OSINT databases</li>
+                <li>Reverse phone lookup capabilities</li>
+                <li>Social media profile discovery</li>
+                <li>Spam/scam number identification</li>
+                <li>Carrier and location information</li>
+                <li>No registration required</li>
+            </ul>
+        </div>
+
+        <div class="search-card">
+            <div class="input-group">
+                <input type="tel" id="phoneInput" placeholder="Enter phone number (e.g., +1234567890)" />
+                <button class="search-btn" onclick="searchAll()">Search All</button>
+            </div>
+            <p class="info-text">💡 Tip: Include country code for better results (e.g., +1 for US, +44 for UK)</p>
+
+            <h2 style="margin-bottom: 20px; color: #333;">Available OSINT Sources:</h2>
+            
+            <div class="sources-grid">
+                <div class="source-card" onclick="searchSource('truecaller')">
+                    <div class="source-icon">📱</div>
+                    <h3>Truecaller</h3>
+                    <p>Caller ID & spam detection</p>
+                </div>
+
+                <div class="source-card" onclick="searchSource('whitepages')">
+                    <div class="source-icon">📖</div>
+                    <h3>WhitePages</h3>
+                    <p>US phone directory</p>
+                </div>
+
+                <div class="source-card" onclick="searchSource('spokeo')">
+                    <div class="source-icon">🔎</div>
+                    <h3>Spokeo</h3>
+                    <p>People search engine</p>
+                </div>
+
+                <div class="source-card" onclick="searchSource('numverify')">
+                    <div class="source-icon">✅</div>
+                    <h3>NumVerify</h3>
+                    <p>Phone validation & lookup</p>
+                </div>
+
+                <div class="source-card" onclick="searchSource('phoneinfoga')">
+                    <div class="source-icon">🌐</div>
+                    <h3>PhoneInfoga</h3>
+                    <p>Advanced OSINT scanner</p>
+                </div>
+
+                <div class="source-card" onclick="searchSource('sync')">
+                    <div class="source-icon">👤</div>
+                    <h3>Sync.me</h3>
+                    <p>Social profile finder</p>
+                </div>
+
+                <div class="source-card" onclick="searchSource('getcontact')">
+                    <div class="source-icon">📞</div>
+                    <h3>GetContact</h3>
+                    <p>Caller identification</p>
+                </div>
+
+                <div class="source-card" onclick="searchSource('spydialer')">
+                    <div class="source-icon">🕵️</div>
+                    <h3>SpyDialer</h3>
+                    <p>Free reverse lookup</p>
+                </div>
+
+                <div class="source-card" onclick="searchSource('411')">
+                    <div class="source-icon">ℹ️</div>
+                    <h3>411.com</h3>
+                    <p>Directory assistance</p>
+                </div>
+
+                <div class="source-card" onclick="searchSource('zlookup')">
+                    <div class="source-icon">🔍</div>
+                    <h3>ZLookup</h3>
+                    <p>Free carrier lookup</p>
+                </div>
+
+                <div class="source-card" onclick="searchSource('pipl')">
+                    <div class="source-icon">👥</div>
+                    <h3>Pipl</h3>
+                    <p>Identity resolution</p>
+                </div>
+
+                <div class="source-card" onclick="searchSource('thatsthem')">
+                    <div class="source-icon">🎯</div>
+                    <h3>ThatsThem</h3>
+                    <p>Free people search</p>
+                </div>
+
+                <div class="source-card" onclick="searchSource('fastpeoplesearch')">
+                    <div class="source-icon">⚡</div>
+                    <h3>FastPeopleSearch</h3>
+                    <p>Quick lookup tool</p>
+                </div>
+
+                <div class="source-card" onclick="searchSource('beenverified')">
+                    <div class="source-icon">✔️</div>
+                    <h3>BeenVerified</h3>
+                    <p>Background checks</p>
+                </div>
+
+                <div class="source-card" onclick="searchSource('intelius')">
+                    <div class="source-icon">📊</div>
+                    <h3>Intelius</h3>
+                    <p>Public records search</p>
+                </div>
+
+                <div class="source-card" onclick="searchSource('google')">
+                    <div class="source-icon">🔎</div>
+                    <h3>Google Search</h3>
+                    <p>General web search</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="disclaimer">
+            <h3>⚠️ Legal Disclaimer</h3>
+            <p>
+                This tool is provided for educational and legitimate OSINT research purposes only. 
+                Users must comply with all applicable laws and regulations regarding privacy and data protection. 
+                Do not use this tool for harassment, stalking, or any illegal activities. 
+                Always respect privacy rights and obtain proper authorization when required. 
+                The creators of this tool are not responsible for misuse.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const sources = {
+            truecaller: 'https://www.truecaller.com/search/in/',
+            whitepages: 'https://www.whitepages.com/phone/',
+            spokeo: 'https://www.spokeo.com/',
+            numverify: 'https://numverify.com/',
+            phoneinfoga: 'https://github.com/sundowndev/phoneinfoga',
+            sync: 'https://sync.me/',
+            getcontact: 'https://www.getcontact.com/',
+            spydialer: 'https://www.spydialer.com/',
+            '411': 'https://www.411.com/phone/',
+            zlookup: 'https://www.zlookup.com/',
+            pipl: 'https://pipl.com/',
+            thatsthem: 'https://thatsthem.com/phone/',
+            fastpeoplesearch: 'https://www.fastpeoplesearch.com/',
+            beenverified: 'https://www.beenverified.com/phone/',
+            intelius: 'https://www.intelius.com/phone/',
+            google: 'https://www.google.com/search?q='
+        };
+
+        function getPhoneNumber() {
+            const phone = document.getElementById('phoneInput').value.trim();
+            if (!phone) {
+                alert('Please enter a phone number');
+                return null;
+            }
+            return phone;
+        }
+
+        function searchSource(source) {
+            const phone = getPhoneNumber();
+            if (!phone) return;
+
+            let url = sources[source];
+            if (source === 'google') {
+                url += encodeURIComponent(phone);
+            } else if (source === 'phoneinfoga') {
+                window.open(url, '_blank');
+                return;
+            } else {
+                url += phone.replace(/[^0-9+]/g, '');
+            }
+            
+            window.open(url, '_blank');
+        }
+
+        function searchAll() {
+            const phone = getPhoneNumber();
+            if (!phone) return;
+
+            const confirm = window.confirm(`This will open multiple tabs for phone number: ${phone}\n\nContinue?`);
+            if (!confirm) return;
+
+            // Open primary sources
+            const primarySources = ['truecaller', 'whitepages', 'spokeo', 'spydialer', 'google'];
+            
+            primarySources.forEach((source, index) => {
+                setTimeout(() => {
+                    searchSource(source);
+                }, index * 500); // Stagger opening to avoid browser blocking
+            });
+        }
+
+        // Allow Enter key to search
+        document.getElementById('phoneInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchAll();
+            }
+        });
+    </script>
+</body>
+</html>
